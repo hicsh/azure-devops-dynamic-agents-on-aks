@@ -1,0 +1,13 @@
+trigger: none
+
+pool:
+  aks-ado-default
+
+steps:
+- script: |
+    while true
+      do
+        curl -s https://www.boredapi.com/api/activity/ | jq -r '.activity'
+        sleep 10
+      done
+  displayName: 'Long job simulation'

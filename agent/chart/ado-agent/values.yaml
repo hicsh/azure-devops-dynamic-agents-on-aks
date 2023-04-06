@@ -1,0 +1,61 @@
+# Default values for ado-agent.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# The name of Azure DevOps agent
+azure:
+  url:
+  b64token: ""
+  agent:
+    name: "default-agent"
+    pool:
+      name: ""
+      minReplicaCount: 1
+      maxReplicaCount: 10
+      scalingStrategy: "default"
+
+image:
+  repository: 
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+
+
+imagePullSecrets: []
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "0.5"
+  limits:
+    memory: "256Mi"
+    cpu: "0.5"
+
+volumes: 
+  - name: docker-volume
+    hostPath:
+      path: /var/run/docker.sock
+volumeMounts:
+  - mountPath: /var/run/docker.sock
+    name: docker-volume
+
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

@@ -1,0 +1,7 @@
+azure:
+  url: https://dev.azure.com/<you azure devops>
+  b64token: <PAT decoded in base64>
+  agent:
+    name: "aks-ado-default-aks-scaled"
+    pool:
+      name: "aks-ado-default"

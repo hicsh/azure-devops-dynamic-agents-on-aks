@@ -1,0 +1,54 @@
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledJob
+metadata:
+  name: {{ .Values.azure.agent.name }}
+  labels:
+    {{- include "ado-agent.labels" . | nindent 4 }}
+spec:
+  jobTargetRef:
+    activeDeadlineSeconds: 600
+    template:
+      spec:
+        containers:
+        - name: "{{ .Values.azure.agent.name }}-job"
+          image: "{{ .Values.image.repository }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+          - name: AZP_URL
+            value: "{{ .Values.azure.url }}"
+          - name: AZP_TOKEN
+            value: "{{ .Values.azure.b64token | b64dec }}"
+          - name: AZP_POOL
+            value: "{{ .Values.azure.agent.pool.name }}"
+          volumeMounts:
+          {{- toYaml .Values.volumeMounts | default "" | nindent 12 }} 
+        volumes:
+        {{- toYaml .Values.volumes | default "" | nindent 8 }} 
+        {{- with .Values.nodeSelector }}
+        nodeSelector:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with .Values.affinity }}
+        affinity:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with .Values.tolerations }}
+        tolerations:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+  pollingInterval: 30
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  minReplicaCount: {{ .Values.azure.agent.pool.minReplicaCount }}
+  maxReplicaCount: {{ .Values.azure.agent.pool.maxReplicaCount }}   
+  scalingStrategy:
+    strategy: {{ .Values.azure.agent.pool.scalingStrategy }}
+  triggers:
+  - type: azure-pipelines
+    metadata:
+      poolName: "{{ .Values.azure.agent.pool.name }}"
+      organizationURLFromEnv: "AZP_URL"
+      personalAccessTokenFromEnv: "AZP_TOKEN"
